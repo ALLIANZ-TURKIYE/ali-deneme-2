@@ -1,1 +1,3 @@
 "# ali-deneme" 
+
+yetki geldi
