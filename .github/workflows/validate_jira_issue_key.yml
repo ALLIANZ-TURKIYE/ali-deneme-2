@@ -1,0 +1,27 @@
+name: Validate Commit Messages
+ 
+on:
+  push:
+    branches:
+      - '**' # Tüm branch'ler için çalıştırılacak
+ 
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate commit messages
+        run: |
+          issue_key_regex="^ATL-[0-9]+"
+          invalid_commits=0
+ 
+          git log ${{ github.event.before }}..${{ github.sha }} --pretty=format:"%h %s" | while read -r hash message; do
+            if ! [[ $message =~ $issue_key_regex ]]; then
+              echo "Geçersiz commit mesajı bulundu: $hash - $message"
+              invalid_commits=$((invalid_commits + 1))
+            fi
+          done
+ 
+          if [[ $invalid_commits -gt 0 ]]; then
+            echo "Push geçersiz commit mesajları içeriyor."
+            exit 1
+          fi
